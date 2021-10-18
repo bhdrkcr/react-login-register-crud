@@ -29,6 +29,7 @@ class EditModal extends Component {
         this.onChangeBirthDate = this.onChangeBirthDate.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleShow = this.handleShow.bind(this);
+        this.onChangeAvatar = this.onChangeAvatar.bind(this);
 
         this.state = {
             id: this.props.object.id,
@@ -36,9 +37,10 @@ class EditModal extends Component {
             first_name: this.props.object.first_name,
             last_name: this.props.object.last_name,
             birth_date: this.props.object.birth_date,
-            avatar: this.props.object.avatar,
+            avatar: "",
             loading: false,
             show: false,
+            file: "",
         };
     }
     onChangeEmail(e) {
@@ -75,6 +77,12 @@ class EditModal extends Component {
             show: true,
         });
     }
+    onChangeAvatar(e) {
+        console.log(e.target.files[0]);
+        this.setState({
+            file: e.target.files[0],
+        });
+    }
 
     handleUpdate(e) {
         e.preventDefault();
@@ -88,7 +96,7 @@ class EditModal extends Component {
         const { dispatch, history } = this.props;
 
         if (this.checkBtn.context._errors.length === 0) {
-            dispatch(update(this.state.id, this.state.password, this.state.first_name, this.state.last_name, this.state.birth_date, e.target.input.files[0]))
+            dispatch(update(this.state.id, this.state.password, this.state.first_name, this.state.last_name, this.state.birth_date, this.state.file))
                 .then(() => {
                     history.push("/user");
                     window.location.reload();
@@ -113,27 +121,27 @@ class EditModal extends Component {
 
         return (
             <>
-                <Button variant="primary" onClick={this.handleShow}><i class="far fa-eye"></i></Button>
+                <Button variant="success" onClick={this.handleShow}><i class="far fa-edit"></i></Button>
 
                 <Modal show={this.state.show} onHide={this.handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title></Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="col-md-12">
-                            <div className="card card-container">
-                                <img
-                                    src="this.props.avatar"
-                                    alt="profile-img"
-                                    className="profile-img-card"
-                                />
+                    <Form
+                        onSubmit={this.handleUpdate}
+                        ref={(c) => {
+                            this.form = c;
+                        }}
+                    >
+                        <Modal.Header closeButton>
+                            <Modal.Title></Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="col-md-12">
+                                <div className="card card-container">
+                                    <img
+                                        src={this.props.object.avatar}
+                                        alt="profile-img"
+                                        className="profile-img-card"
+                                    />
 
-                                <Form
-                                    onSubmit={this.handleUpdate}
-                                    ref={(c) => {
-                                        this.form = c;
-                                    }}
-                                >
                                     <div className="form-group">
                                         <label htmlFor="email">Email</label>
                                         <Input
@@ -181,25 +189,18 @@ class EditModal extends Component {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>avatar</label>
+                                        <label htmlFor="avatar">avatar</label>
                                         <Input
                                             type="file"
                                             className="form-control"
                                             name="input"
-                                            label='File'
+                                            value={this.state.avatar}
+                                            onChange={this.onChangeAvatar}
                                         />
                                     </div>
 
                                     <div className="form-group">
-                                        <button
-                                            className="btn btn-primary btn-block"
-                                            disabled={this.state.loading}
-                                        >
-                                            {this.state.loading && (
-                                                <span className="spinner-border spinner-border-sm"></span>
-                                            )}
-                                            <span>Login</span>
-                                        </button>
+
                                     </div>
 
                                     {message && (
@@ -215,30 +216,28 @@ class EditModal extends Component {
                                             this.checkBtn = c;
                                         }}
                                     />
-                                </Form>
+                                </div>
                             </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={this.handleClose}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={this.handleClose}>
-                            Save Changes
-                        </Button>
-                    </Modal.Footer>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                            <button
+                                className="btn btn-primary btn-block"
+                                disabled={this.state.loading}
+                            >
+                                {this.state.loading && (
+                                    <span className="spinner-border spinner-border-sm"></span>
+                                )}
+                                <span>Save Changes</span>
+                            </button>
+                        </Modal.Footer>
+                    </Form>
                 </Modal>
             </>
         );
     }
-}
-function mapStateToProps(state) {
-    const { isLoggedIn } = state.auth;
-    const { message } = state.message;
-    return {
-        isLoggedIn,
-        message
-    };
 }
 
 export default connect()(EditModal);
