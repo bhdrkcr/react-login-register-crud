@@ -53,7 +53,7 @@ class App extends Component {
         <div>
           <nav className="navbar navbar-expand navbar-dark bg-primary justify-content-center">
             <Link to={"/"} className="navbar-brand">
-              Bhdrkcr
+              lrc
             </Link>
             <div className="navbar-nav mr-auto">
               {currentUser && (
