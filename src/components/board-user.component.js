@@ -4,14 +4,31 @@ import UserService from "../services/user-service";
 
 import DetailModal from "./modals/user-detail-modal";
 import EditModal from "./modals/user-edit-modal";
+import { deleteUser } from "../actions/user";
+import { connect } from "react-redux";
 
-export default class BoardUser extends Component {
+class BoardUser extends Component {
     constructor(props) {
         super(props);
+        this.handleDelete = this.handleDelete.bind(this);
 
         this.state = {
             content: ""
         };
+    }
+
+    handleDelete(e) {
+        const { dispatch, history } = this.props;
+        dispatch(deleteUser(e))
+            .then(() => {
+                history.push("/user");
+                window.location.reload();
+            })
+            .catch(() => {
+                this.setState({
+                    loading: false
+                });
+            });
     }
 
     componentDidMount() {
@@ -67,7 +84,7 @@ export default class BoardUser extends Component {
                                                                 <td>
                                                                     <DetailModal object={item} />
                                                                     <EditModal object={item} />
-                                                                    <Button onClick={this.delete} type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></Button>
+                                                                    <Button onClick={this.handleDelete.bind(this, item.id)} variant="danger" ><i class="far fa-trash-alt"></i></Button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -95,3 +112,4 @@ export default class BoardUser extends Component {
 
     }
 }
+export default connect()(BoardUser);
